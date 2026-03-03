@@ -15,13 +15,31 @@ export const DealColumn = ({
   const totalAmount = deals.reduce((sum, deal) => sum + deal.amount, 0);
 
   const { dealStages } = useConfigurationContext();
+
+  // ✅ Buscamos la definición completa del stage para usar className (color)
+  const stageDef = dealStages?.find((s: any) => s.value === stage);
+
   return (
-    <div className="flex-1 pb-8">
-      <div className="flex flex-col items-center">
-        <h3 className="text-base font-medium">
-          {findDealLabel(dealStages, stage)}
-        </h3>
-        <p className="text-sm text-muted-foreground">
+    <div className="min-w-[280px] max-w-[320px] pb-4 p-2 rounded-2xl border border-muted/40 bg-background">
+      {/* ✅ Header con color (borde + fondo suave) */}
+      <div
+        className={[
+          "rounded-2xl border-l-4 px-3 py-2",
+          stageDef?.className ?? "border-muted bg-muted/20",
+        ].join(" ")}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold leading-snug line-clamp-2">
+            {stageDef?.label ?? findDealLabel(dealStages, stage)}
+          </h3>
+
+          {/* pequeño contador de deals para ayudar visualmente */}
+          <span className="text-xs text-muted-foreground">
+            {deals.length}
+          </span>
+        </div>
+
+        <p className="text-xs text-muted-foreground mt-1">
           {totalAmount.toLocaleString("en-US", {
             notation: "compact",
             style: "currency",
@@ -31,13 +49,14 @@ export const DealColumn = ({
           })}
         </p>
       </div>
+
       <Droppable droppableId={stage}>
         {(droppableProvided, snapshot) => (
           <div
             ref={droppableProvided.innerRef}
             {...droppableProvided.droppableProps}
-            className={`flex flex-col rounded-2xl mt-2 gap-2 ${
-              snapshot.isDraggingOver ? "bg-muted" : ""
+            className={`flex flex-col rounded-2xl mt-2 gap-2 min-h-[140px] border border-dashed border-muted/40 p-2 ${
+              snapshot.isDraggingOver ? "bg-muted/40" : "bg-transparent"
             }`}
           >
             {deals.map((deal, index) => (

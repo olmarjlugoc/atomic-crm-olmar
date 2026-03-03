@@ -212,6 +212,7 @@ export type AttachmentNote = RAFile;
 export interface DealStage {
   value: string;
   label: string;
+  className?: string;
 }
 
 export interface NoteStatus {

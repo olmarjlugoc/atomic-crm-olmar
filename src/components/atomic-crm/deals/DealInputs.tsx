@@ -94,7 +94,7 @@ const DealMiscInputs = () => {
           id: stage.value,
           name: stage.label,
         }))}
-        defaultValue="opportunity"
+        defaultValue={dealStages?.[0]?.value ?? "leads"}
         helperText={false}
         validate={required()}
       />
