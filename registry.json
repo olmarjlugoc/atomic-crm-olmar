@@ -764,6 +764,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/auth/ResetPassword.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/activity/ActivityLogNote.tsx",
           "type": "registry:component"
         },
