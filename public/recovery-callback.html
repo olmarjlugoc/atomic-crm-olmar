@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+    <title>Atomic CRM — Recovery</title>
+  </head>
+  <body>
+    <script>
+      // Lee code/tokens desde query o hash y redirige SIEMPRE a reset-password
+      const queryParams = new URLSearchParams(window.location.search);
+
+      const rawHash = window.location.hash.startsWith("#")
+        ? window.location.hash.slice(1)
+        : window.location.hash;
+
+      const hashParams =
+        rawHash.includes("=") ? new URLSearchParams(rawHash) : new URLSearchParams("");
+
+      const code = queryParams.get("code") || hashParams.get("code");
+      const access_token = hashParams.get("access_token") || queryParams.get("access_token");
+      const refresh_token = hashParams.get("refresh_token") || queryParams.get("refresh_token");
+
+      const qs = new URLSearchParams();
+      qs.set("type", "recovery");
+      if (code) qs.set("code", code);
+      if (access_token) qs.set("access_token", access_token);
+      if (refresh_token) qs.set("refresh_token", refresh_token);
+
+      window.location.replace(`/#/reset-password?${qs.toString()}`);
+    </script>
+  </body>
+</html>
