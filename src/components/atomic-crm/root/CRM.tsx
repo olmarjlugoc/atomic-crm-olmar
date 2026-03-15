@@ -15,7 +15,7 @@ import { Admin } from "@/components/admin/admin";
 import { ForgotPasswordPage } from "@/components/supabase/forgot-password-page";
 import { SetPasswordPage } from "@/components/supabase/set-password-page";
 import { OAuthConsentPage } from "@/components/supabase/oauth-consent-page";
-
+import { ResetPassword } from "../auth/ResetPassword";
 import companies from "../companies";
 import contacts from "../contacts";
 import { Dashboard } from "../dashboard/Dashboard";
@@ -182,6 +182,7 @@ const DesktopAdmin = (props: CoreAdminProps) => {
           element={<ForgotPasswordPage />}
         />
         <Route path={OAuthConsentPage.path} element={<OAuthConsentPage />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </CustomRoutes>
 
       <CustomRoutes>

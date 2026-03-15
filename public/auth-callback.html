@@ -116,25 +116,52 @@
             </div>
         </div>
     </body>
-    <script>
-        const getUrlParams = () => {
-            const urlSearchParams = new URLSearchParams(
-                window.location.hash.substring(1)
-            );
-            const access_token = urlSearchParams.get('access_token');
-            const refresh_token = urlSearchParams.get('refresh_token');
-            const type = urlSearchParams.get('type');
+<script>
+  const getParams = () => {
+    // 1) hash params (ej: #access_token=...&refresh_token=...&type=recovery)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
 
-            return { access_token, refresh_token, type };
-        };
+    // 2) query params (ej: ?code=... o ?token=...&type=recovery)
+    const queryParams = new URLSearchParams(window.location.search);
 
-        function interceptAuthCallback() {
-                const hash = window.location.hash;
-                const {access_token, refresh_token, type} = getUrlParams();
-                window.location.href = `./#/auth-callback?access_token=${access_token}&refresh_token=${refresh_token}&type=${type}`;
-        }
-    
-        // Call the function to intercept the auth callback
-        interceptAuthCallback();
-    </script>
+    const access_token = hashParams.get("access_token") || queryParams.get("access_token");
+    const refresh_token = hashParams.get("refresh_token") || queryParams.get("refresh_token");
+
+    // Supabase a veces manda type en query, a veces en hash
+    const type = hashParams.get("type") || queryParams.get("type");
+
+    // Code exchange flow (muy común en recovery/invite dependiendo configuración)
+    const code = queryParams.get("code");
+
+    return { access_token, refresh_token, type, code };
+  };
+
+  function interceptAuthCallback() {
+    const { access_token, refresh_token, type, code } = getParams();
+
+    // ✅ Si es recovery: manda a la pantalla donde el usuario define la contraseña
+    if (type === "recovery") {
+      // Pasa tokens si vienen, o el code si viene
+      const qs = new URLSearchParams();
+      if (access_token) qs.set("access_token", access_token);
+      if (refresh_token) qs.set("refresh_token", refresh_token);
+      if (code) qs.set("code", code);
+      qs.set("type", "recovery");
+
+      window.location.href = `./#/reset-password?${qs.toString()}`;
+      return;
+    }
+
+    // ✅ Flujo normal: manda al handler existente
+    const qs = new URLSearchParams();
+    if (access_token) qs.set("access_token", access_token);
+    if (refresh_token) qs.set("refresh_token", refresh_token);
+    if (code) qs.set("code", code);
+    if (type) qs.set("type", type);
+
+    window.location.href = `./#/auth-callback?${qs.toString()}`;
+  }
+
+  interceptAuthCallback();
+</script>
 </html>
