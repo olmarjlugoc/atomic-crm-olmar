@@ -28,8 +28,12 @@ export function ResetPassword() {
           : window.location.search.slice(1);
 
       const params = new URLSearchParams(queryPart ?? "");
-      const code = params.get("code");
 
+      const code = params.get("code");
+      const access_token = params.get("access_token");
+      const refresh_token = params.get("refresh_token");
+
+      // 1) Flow con code (si aplica)
       if (code) {
         const { error: exchangeError } =
           await supabase.auth.exchangeCodeForSession(code);
@@ -39,6 +43,26 @@ export function ResetPassword() {
         }
       }
 
+      // 2) Flow con tokens (tu caso actual)
+      if (access_token && refresh_token) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        });
+        if (sessionError) {
+          setMsg(sessionError.message);
+          return;
+        }
+      }
+
+      // 3) Confirmar que exista sesión
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        setMsg("Link inválido o expirado. Vuelve a solicitar 'Forgot password'.");
+        return;
+      }
+
+      // 4) Actualizar password
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
         setMsg(error.message);
